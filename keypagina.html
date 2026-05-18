@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BYPAS.HUB — Key System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0a0c28;
+    --bg2:      #1e2370;
+    --primary:  #6478ff;
+    --accent:   #96aaff;
+    --aurora1:  #3c50c8;
+    --aurora2:  #2d3caa;
+    --text:     #ffffff;
+    --text2:    #c8d2ff;
+    --text3:    #7882c8;
+    --success:  #4ade80;
+    --error:    #f87171;
+    --card-bg:  rgba(30,35,110,0.55);
+    --border:   rgba(100,120,255,0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── Fondo animado ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(60,80,200,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(100,120,255,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(45,60,170,0.10) 0%, transparent 60%);
+    animation: bgPulse 8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes bgPulse {
+    0%   { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 1;   transform: scale(1.04); }
+  }
+
+  /* ── Grid dots ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: radial-gradient(circle, rgba(100,120,255,0.12) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+
+  /* ── Layout ── */
+  .wrapper {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.7s cubic-bezier(.16,1,.3,1) both;
+  }
+  .logo {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    letter-spacing: -1px;
+    background: linear-gradient(120deg, var(--primary) 0%, var(--accent) 50%, var(--primary) 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmerText 3s linear infinite;
+  }
+  @keyframes shimmerText {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  .logo span { font-family: 'Space Mono', monospace; }
+  .tagline {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Card base ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    width: 100%; max-width: 520px;
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--accent), var(--primary), transparent);
+    background-size: 200% 100%;
+    animation: borderFlow 3s linear infinite;
+  }
+  @keyframes borderFlow {
+    0%   { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+  }
+
+  /* ── Steps card ── */
+  .steps-card {
+    animation: fadeUp 0.6s cubic-bezier(.16,1,.3,1) 0.1s both;
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+
+  .step {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: rgba(60,80,200,0.12);
+    border: 1px solid rgba(100,120,255,0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .step::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(100,120,255,0.08), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .step:hover::after { opacity: 1; }
+  .step:hover { border-color: rgba(100,120,255,0.4); transform: translateX(3px); }
+  .step.done {
+    border-color: rgba(74,222,128,0.3);
+    background: rgba(74,222,128,0.06);
+  }
+  .step.done .step-num {
+    background: var(--success);
+    color: #000;
+    font-size: 0.85rem;
+  }
+
+  .step-num {
+    width: 32px; height: 32px; flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(100,120,255,0.2);
+    border: 1.5px solid var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    transition: all 0.3s;
+  }
+  .step-info { flex: 1; }
+  .step-info strong { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+  .step-info p { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+  .step-action {
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--accent);
+    background: rgba(100,120,255,0.15);
+    border: 1px solid rgba(100,120,255,0.3);
+    border-radius: 6px;
+    padding: 4px 10px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .step-action:hover {
+    background: rgba(100,120,255,0.3);
+    color: #fff;
+  }
+
+  /* ── Timer ── */
+  .timer-wrap {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(45,55,160,0.25);
+    border: 1px solid rgba(100,120,255,0.2);
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .timer-icon { font-size: 1.1rem; }
+  .timer-txt { font-size: 0.85rem; color: var(--text2); }
+  .timer-count {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* ── Get key button ── */
+  .get-key-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--aurora1), var(--primary));
+    border: none; border-radius: 12px;
+    color: #fff; font-family: 'Outfit', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .get-key-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(100,120,255,0.4); }
+  .get-key-btn:active { transform: translateY(0); }
+  .get-key-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .get-key-btn::before {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    transition: left 0.5s;
+  }
+  .get-key-btn:not(:disabled):hover::before { left: 150%; }
+
+  /* ── Key display card ── */
+  .key-card {
+    animation: fadeUp 0.5s cubic-bezier(.16,1,.3,1) both;
+    margin-bottom: 24px;
+    display: none;
+  }
+  .key-card.visible { display: block; }
+
+  .key-box {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(25,30,90,0.7);
+    border: 1.5px solid rgba(100,120,255,0.4);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 4px;
+  }
+  .key-text {
+    flex: 1;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    word-break: break-all;
+  }
+  .copy-btn {
+    background: rgba(100,120,255,0.2);
+    border: 1px solid rgba(100,120,255,0.4);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: var(--accent);
+    font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+    font-family: 'Outfit', sans-serif;
+  }
+  .copy-btn:hover { background: rgba(100,120,255,0.38); color: #fff; }
+  .copy-btn.copied { background: rgba(74,222,128,0.2); color: var(--success); border-color: rgba(74,222,128,0.4); }
+
+  .key-hint {
+    margin-top: 10px;
+    font-size: 0.78rem; color: var(--text3);
+    display: flex; align-items: flex-start; gap: 6px;
+  }
+  .key-hint .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--primary); flex-shrink: 0; margin-top: 4px;
+  }
+
+  /* ── Status badge ── */
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; font-weight: 600;
+    padding: 4px 12px; border-radius: 100px;
+    margin-bottom: 14px;
+  }
+  .status-badge.pending {
+    background: rgba(100,120,255,0.12);
+    border: 1px solid rgba(100,120,255,0.25);
+    color: var(--text3);
+  }
+  .status-badge.ready {
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: var(--success);
+  }
+  .status-badge .pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Already has key banner ── */
+  .has-key-banner {
+    width: 100%; max-width: 520px;
+    padding: 16px 20px;
+    background: rgba(74,222,128,0.08);
+    border: 1.5px solid rgba(74,222,128,0.3);
+    border-radius: 14px;
+    display: none; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.4s cubic-bezier(.16,1,.3,1) both;
+    font-size: 0.9rem;
+  }
+  .has-key-banner.visible {
+    display: flex;
+  }
+  .has-key-banner .icon { font-size: 1.4rem; }
+  .has-key-banner strong { color: var(--success); font-weight: 700; display: block; font-size: 0.95rem; }
+  .has-key-banner span { color: var(--text3); font-size: 0.8rem; }
+
+  /* ── Footer ── */
+  .footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.78rem;
+    color: var(--text3);
+  }
+  .footer span { color: var(--primary); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--aurora1); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">✦ BYPAS<span>.HUB</span></div>
+    <div class="tagline">Sistema de verificación de acceso</div>
+  </div>
+
+  <!-- Banner: ya tiene key -->
+  <div class="has-key-banner" id="hasKeyBanner">
+    <div class="icon">✅</div>
+    <div>
+      <strong>Key verificada en este navegador</strong>
+      <span>Tu key está guardada. El hub la detectará automáticamente.</span>
+    </div>
+  </div>
+
+  <!-- Steps card -->
+  <div class="card steps-card">
+    <div class="card-title">Pasos requeridos</div>
+
+    <div class="status-badge pending" id="statusBadge">
+      <div class="pulse"></div>
+      <span id="statusTxt">Completá los pasos para obtener tu key</span>
+    </div>
+
+    <div class="steps">
+      <div class="step" id="step1" onclick="completeStep(1, 'https://discord.gg/bypas')">
+        <div class="step-num" id="num1">1</div>
+        <div class="step-info">
+          <strong>Unirse al Discord</strong>
+          <p>Entrá al servidor oficial de BYPAS</p>
+        </div>
+        <a class="step-action" href="https://discord.gg/bypas" target="_blank" onclick="event.stopPropagation(); completeStep(1)">
+          Unirse →
+        </a>
+      </div>
+
+      <div class="step" id="step2" onclick="completeStep(2, 'https://linkvertise.com/bypas-key')">
+        <div class="step-num" id="num2">2</div>
+        <div class="step-info">
+          <strong>Completar verificación</strong>
+          <p>Hacé clic en el link de verificación</p>
+        </div>
+        <a class="step-action" href="https://linkvertise.com/bypas-key" target="_blank" onclick="event.stopPropagation(); completeStep(2)">
+          Verificar →
+        </a>
+      </div>
+
+      <div class="step" id="step3" onclick="completeStep(3, 'https://youtube.com/@bypas')">
+        <div class="step-num" id="num3">3</div>
+        <div class="step-info">
+          <strong>Suscribirse al canal</strong>
+          <p>Suscribite al canal de YouTube de BYPAS</p>
+        </div>
+        <a class="step-action" href="https://youtube.com/@bypas" target="_blank" onclick="event.stopPropagation(); completeStep(3)">
+          Suscribirse →
+        </a>
+      </div>
+    </div>
+
+    <!-- Timer de cooldown -->
+    <div class="timer-wrap" id="timerWrap" style="display:none">
+      <div class="timer-icon">⏳</div>
+      <div class="timer-txt">Esperá antes de obtener la key</div>
+      <div class="timer-count" id="timerCount">0:30</div>
+    </div>
+
+    <button class="get-key-btn" id="getKeyBtn" onclick="generateKey()" disabled>
+      Completá todos los pasos para continuar
+    </button>
+  </div>
+
+  <!-- Key display card -->
+  <div class="card key-card" id="keyCard">
+    <div class="card-title">Tu key de acceso</div>
+    <div class="key-box">
+      <div class="key-text" id="keyDisplay">—</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyKey()">Copiar</button>
+    </div>
+    <div class="key-hint">
+      <div class="dot"></div>
+      <span>Esta key está guardada en tu navegador. El hub la detectará automáticamente cuando la pegues en el campo de verificación.</span>
+    </div>
+    <div class="key-hint" style="margin-top:6px">
+      <div class="dot"></div>
+      <span>La key expira en <strong style="color:var(--accent)" id="expiryTxt">24 horas</strong>. Después deberás volver a verificarte.</span>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  BYPAS.HUB · by <span>CapybaraScript</span> · Solo para uso personal
+</footer>
+
+<script>
+// ── Estado de pasos ─────────────────────────────────────────
+const STEPS_KEY   = 'bypas_steps';
+const KEY_STORE   = 'bypas_key';
+const EXPIRY_STORE = 'bypas_key_expiry';
+const TIMER_KEY   = 'bypas_timer_start';
+const STEP_TIMER  = 30; // segundos de espera tras completar todos los pasos
+
+let steps = JSON.parse(localStorage.getItem(STEPS_KEY) || '{}');
+let timerInterval = null;
+
+// ── Al cargar ────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  checkExistingKey();
+  restoreSteps();
+  checkAllDone();
+});
+
+function checkExistingKey() {
+  const key    = localStorage.getItem(KEY_STORE);
+  const expiry = parseInt(localStorage.getItem(EXPIRY_STORE) || '0');
+  if (key && Date.now() < expiry) {
+    document.getElementById('hasKeyBanner').classList.add('visible');
+    showKey(key, expiry);
+  }
+}
+
+function restoreSteps() {
+  [1, 2, 3].forEach(n => {
+    if (steps[n]) markStepDone(n, false);
+  });
+}
+
+// ── Completar paso ───────────────────────────────────────────
+function completeStep(n) {
+  steps[n] = true;
+  localStorage.setItem(STEPS_KEY, JSON.stringify(steps));
+  markStepDone(n, true);
+  checkAllDone();
+}
+
+function markStepDone(n, animate) {
+  const el  = document.getElementById('step' + n);
+  const num = document.getElementById('num' + n);
+  el.classList.add('done');
+  num.textContent = '✓';
+  if (animate) {
+    el.style.transform = 'scale(1.02)';
+    setTimeout(() => el.style.transform = '', 250);
+  }
+}
+
+function checkAllDone() {
+  const allDone = steps[1] && steps[2] && steps[3];
+  const btn = document.getElementById('getKeyBtn');
+  if (!allDone) {
+    btn.disabled = true;
+    btn.textContent = 'Completá todos los pasos para continuar';
+    return;
+  }
+
+  // Iniciar o continuar el timer si no expiró
+  const timerStart = parseInt(localStorage.getItem(TIMER_KEY) || '0');
+  const elapsed    = Math.floor((Date.now() - timerStart) / 1000);
+  const remaining  = STEP_TIMER - elapsed;
+
+  if (!timerStart || timerStart === 0) {
+    localStorage.setItem(TIMER_KEY, Date.now().toString());
+    startTimer(STEP_TIMER);
+  } else if (remaining > 0) {
+    startTimer(remaining);
+  } else {
+    enableGetKey();
+  }
+}
+
+function startTimer(seconds) {
+  const timerWrap = document.getElementById('timerWrap');
+  timerWrap.style.display = 'flex';
+  document.getElementById('getKeyBtn').disabled = true;
+  document.getElementById('getKeyBtn').textContent = 'Esperá...';
+
+  let left = seconds;
+  updateTimerDisplay(left);
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    left--;
+    updateTimerDisplay(left);
+    if (left <= 0) {
+      clearInterval(timerInterval);
+      timerWrap.style.display = 'none';
+      enableGetKey();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(s) {
+  const m = Math.floor(s / 60);
+  const sec = String(s % 60).padStart(2, '0');
+  document.getElementById('timerCount').textContent = m + ':' + sec;
+}
+
+function enableGetKey() {
+  const btn = document.getElementById('getKeyBtn');
+  btn.disabled = false;
+  btn.textContent = '✦ Obtener mi Key de Acceso';
+  const badge = document.getElementById('statusBadge');
+  badge.className = 'status-badge ready';
+  document.getElementById('statusTxt').textContent = 'Listo para obtener tu key';
+}
+
+// ── Generar key ──────────────────────────────────────────────
+function generateKey() {
+  // Generar key con formato BYPAS-XXXX-XXXX-XXXX
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const seg   = () => Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+  const key   = 'BYPAS-' + seg() + '-' + seg() + '-' + seg();
+
+  // Guardar con expiración de 24h
+  const expiry = Date.now() + 24 * 60 * 60 * 1000;
+  localStorage.setItem(KEY_STORE, key);
+  localStorage.setItem(EXPIRY_STORE, expiry.toString());
+
+  // Mostrar
+  showKey(key, expiry);
+
+  // Banner
+  document.getElementById('hasKeyBanner').classList.add('visible');
+
+  // Limpiar estado de pasos para el próximo ciclo (en 24h)
+  setTimeout(() => {
+    localStorage.removeItem(STEPS_KEY);
+    localStorage.removeItem(TIMER_KEY);
+  }, 100);
+}
+
+function showKey(key, expiry) {
+  document.getElementById('keyDisplay').textContent = key;
+  document.getElementById('keyCard').classList.add('visible');
+
+  // Mostrar cuánto falta para expirar
+  const hoursLeft = Math.max(1, Math.floor((expiry - Date.now()) / 3600000));
+  document.getElementById('expiryTxt').textContent = hoursLeft + ' hora' + (hoursLeft !== 1 ? 's' : '');
+}
+
+// ── Copiar key ───────────────────────────────────────────────
+function copyKey() {
+  const key = document.getElementById('keyDisplay').textContent;
+  navigator.clipboard.writeText(key).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copiar';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ── API endpoint para el script Lua ─────────────────────────────────
+// Cuando el hub hace: GET keypagina.html?getkey=1
+// Esta página detecta el parámetro y devuelve JSON con la key
+// (Funciona en GitHub Pages con un pequeño truco: iframe + postMessage
+//  no es necesario — el Lua script hace request HTTP normal y lee el HTML.
+//  Insertamos la key en un <meta> tag que el Lua puede parsear.)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('getkey') === '1') {
+    const key    = localStorage.getItem('bypas_key');
+    const expiry = parseInt(localStorage.getItem('bypas_key_expiry') || '0');
+    // Sobreescribir toda la página con JSON puro para que el script Lua lo lea
+    document.open();
+    document.write(JSON.stringify({ key: key || null, expiry: expiry || 0 }));
+    document.close();
+  }
+})();
+</script>
+</body>
+</html>
